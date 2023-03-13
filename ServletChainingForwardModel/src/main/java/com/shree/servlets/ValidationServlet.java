@@ -21,7 +21,7 @@ public class ValidationServlet extends HttpServlet {
 		String phoneNumber = request.getParameter("phoneNumber");
 		
 		if(name.isEmpty() || phoneNumber.length() < 10) {
-			response.getWriter().append("<h1>Data you entered is not correct... </br></h1>");
+			request.getRequestDispatcher("Error.html").forward(request, response);
 		} else {
 			response.getWriter().append("<h1>Data is fine... </br></br></h1>");
 			response.getWriter().append("Welcome " + name);
