@@ -25,40 +25,23 @@ public class LoginServlet extends HttpServlet {
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
 		HttpSession session = request.getSession(true);
-		//Cookie userCookie = new Cookie(COOKIE_NAME, email);
 		session.setAttribute(COOKIE_NAME, email);
 		userMap.put(email, password);
-		//response.addCookie(userCookie);
 		response.getWriter().println(email + " logged in !!!");
 	}
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		//Cookie[] cookies = req.getCookies();
-		//Cookie userCookie = null;
 		HttpSession session = req.getSession(false);
 		if(session == null ) {
 			resp.getWriter().println("No user logged in");
 			return;
 		}
-		/*for(Cookie cookie: cookies) {
-			if(cookie.getName().equals(COOKIE_NAME)) {
-				userCookie = cookie;
-				break;
-			}
-		}
-		
-		if(null == userCookie || userCookie.getName().isEmpty()) {
-			resp.getWriter().println("No user logged in");
-			return;
-		}*/
 		String email = (String) session.getAttribute(COOKIE_NAME);
 		resp.getWriter().println("Login details received...");
 		resp.getWriter().println("email: " + email);
 		resp.getWriter().println("password: " + userMap.get(email));
 		resp.getWriter().println("Logging out ...");
-		//userCookie.setMaxAge(0);
-		//resp.addCookie(userCookie);
 		session.invalidate();
 	}
 
