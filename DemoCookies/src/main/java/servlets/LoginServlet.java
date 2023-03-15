@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String COOKIE_NAME = "user-id";
-	private static final HashMap<String, String> userMap =new HashMap<>();;
+	private static final HashMap<String, String> userMap =new HashMap<>();
      
     public LoginServlet() {
         super();
@@ -23,9 +23,6 @@ public class LoginServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
-		//response.getWriter().println("Login details received...");
-		//response.getWriter().println("email: " + email);
-		//response.getWriter().println("password: " + "*".repeat(password.length()));
 		Cookie userCookie = new Cookie(COOKIE_NAME, email);
 		userMap.put(email, password);
 		response.addCookie(userCookie);
@@ -36,6 +33,10 @@ public class LoginServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		Cookie[] cookies = req.getCookies();
 		Cookie userCookie = null;
+		if(cookies == null ) {
+			resp.getWriter().println("No user logged in");
+			return;
+		}
 		for(Cookie cookie: cookies) {
 			if(cookie.getName().equals(COOKIE_NAME)) {
 				userCookie = cookie;
@@ -43,13 +44,16 @@ public class LoginServlet extends HttpServlet {
 			}
 		}
 		
-		if(null == userCookie) {
+		if(null == userCookie || userCookie.getName().isEmpty()) {
 			resp.getWriter().println("No user logged in");
 			return;
 		}
 		resp.getWriter().println("Login details received...");
 		resp.getWriter().println("email: " + userCookie.getValue());
 		resp.getWriter().println("password: " + userMap.get(userCookie.getValue()));
+		resp.getWriter().println("Logging out ...");
+		userCookie.setMaxAge(0);
+		resp.addCookie(userCookie);
 	}
 
 }
