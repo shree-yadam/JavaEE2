@@ -10,25 +10,24 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpFilter;
 
-//@WebFilter("/*")
-public class MyFirstFilter extends HttpFilter implements Filter {
+public class MySecondFilter extends HttpFilter implements Filter {
        
-    public MyFirstFilter() {
+    public MySecondFilter() {
         super();
     }
 
 	public void destroy() {
-		System.out.println("MyFristFilter destroy called ....");
+		System.out.println("MySecondFilter destroy called ....");
 	}
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-		System.out.println("MyFristFilter entereed ....");
+		System.out.println("MySecondFilter entereed ....");
 		chain.doFilter(request, response);
-		System.out.println("MyFristFilter exit ....");
+		System.out.println("MySecondFilter exit ....");
 	}
 
 	public void init(FilterConfig fConfig) throws ServletException {
-		System.out.println("MyFristFilter init called ....");
+		System.out.println("MySecondFilter init called ....");
 	}
 
 }
