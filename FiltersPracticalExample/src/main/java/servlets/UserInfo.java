@@ -56,7 +56,7 @@ public class UserInfo {
 		sb.append("Name: ").append(name).append("\n");
 		sb.append("Phone Number: ").append(phoneNumber).append("\n");
 		sb.append("Email: ").append(email).append("\n");
-		sb.append("Password: ").append(password).append("\n");
+		sb.append("Password: ").append("*".repeat(password.length())).append("\n");
 		return sb.toString();
 	}
 	
