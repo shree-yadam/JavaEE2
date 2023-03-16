@@ -14,7 +14,7 @@ import javax.servlet.http.HttpSession;
 public class Register extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String COOKIE_NAME = "user-id";
-	private static final HashMap<String, String> userMap =new HashMap<>();
+	private static final HashMap<String, UserInfo> userMap =new HashMap<>();
 
     public Register() {
         super();
@@ -28,8 +28,7 @@ public class Register extends HttpServlet {
 		}
 		String email = (String) session.getAttribute(COOKIE_NAME);
 		response.getWriter().println("Login details received...");
-		response.getWriter().println("email: " + email);
-		response.getWriter().println("password: " + userMap.get(email));
+		response.getWriter().println(userMap.get(email));
 		response.getWriter().println("Logging out ...");
 		session.invalidate();
 	}
@@ -39,9 +38,10 @@ public class Register extends HttpServlet {
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
 		String phoneNumber = request.getParameter("phoneNumber");
+		UserInfo userInfo = new UserInfo(fullName, phoneNumber, email, password);
 		HttpSession session = request.getSession(true);
 		session.setAttribute(COOKIE_NAME, email);
-		userMap.put(email, password);
+		userMap.put(email, userInfo);
 		response.getWriter().println(fullName + " logged in !!!");
 	}
 
