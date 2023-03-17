@@ -46,9 +46,9 @@ public class Users extends HttpServlet {
         	
 			dbConnection = DriverManager.getConnection(connectionURL.toString(), dbUsername, dbPassword);
 		} catch (SQLException e) {
-			System.out.println("Exception getting DB connection");
+			System.out.println("Exception getting DB connection " + e);
 		} catch (ClassNotFoundException e1) {
-			System.out.println("ClassNotFoundException");
+			System.out.println("ClassNotFoundException " + e1);
 		}
 	}
 
@@ -71,7 +71,7 @@ public class Users extends HttpServlet {
 			result.close();
 			st.close();
 		} catch (SQLException e) {
-			System.out.println("SQLException");
+			System.out.println("SQLException " + e);
 		}
 		
 	}
@@ -96,13 +96,51 @@ public class Users extends HttpServlet {
 			
 			response.sendRedirect(request.getContextPath() + "/users");
 		} catch (SQLException e) {
-			System.out.println("SQLException");
+			System.out.println("SQLException " + e);
 		}
 		
 	}
 
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		StringBuffer sb = new StringBuffer("UPDATE users SET ");
+		String rName = request.getParameter("name");
+		String rEmail = request.getParameter("email");
+		String rPassword = request.getParameter("password");
+		String rPhoneNumber = request.getParameter("phoneNumber");
+		int id = Integer.parseInt(request.getParameter("id"));
+		
+		if(!rName.isEmpty()) {
+			sb.append("name = ? WHERE id = ?");
+		} else if(!rEmail.isEmpty()) {
+			sb.append("email = ? WHERE id = ?");
+		} else if(!rPassword.isEmpty()) {
+			sb.append("password = ? WHERE id = ");
+		} else if(!rPhoneNumber.isEmpty()) {
+			sb.append("phone_number = ? WHERE id = ");
+		}
+		try {
+			PreparedStatement pSt = dbConnection.prepareStatement(sb.toString());
+			
+			if(!rName.isEmpty()) {
+				pSt.setString(1, rName);
+			} else if(!rEmail.isEmpty()) {
+				pSt.setString(1, rEmail);
+			} else if(!rPassword.isEmpty()) {
+				pSt.setString(1, rPassword);
+			} else if(!rPhoneNumber.isEmpty()) {
+				pSt.setInt(1, Integer.parseInt(rPhoneNumber));
+			}
+			
+			pSt.setInt(2, id);
+			
+			int numRows = pSt.executeUpdate();
+			
+			System.out.println(numRows + " rows updated.");
+			
+			response.sendRedirect(request.getContextPath() + "/users");
+		} catch (SQLException e) {
+			System.out.println("SQLException " + e);
+		}
 	}
 
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
