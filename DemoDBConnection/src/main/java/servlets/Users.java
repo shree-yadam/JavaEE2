@@ -57,15 +57,17 @@ public class Users extends HttpServlet {
 			Statement st = dbConnection.createStatement();
 
 			ResultSet result = st.executeQuery("SELECT * FROM users");
-			response.getWriter().append("<html><body><table><tbody>");
-			response.getWriter().append("<tr><td>NAME</td><td>EMAIL</td><td>PHONE NUMBER</td></tr>");
+			StringBuffer sb = new StringBuffer("<html>\n\t<body>\n\t\t<table>\n\t\t\t<tbody>\n");
+			sb.append("\t\t\t\t<tr><td>NAME</td><td>EMAIL</td><td>PHONE NUMBER</td></tr>\n");
 			while(result.next()) {
 				String name = result.getString("name");
 				String phoneNumber = result.getString("phone_number");
 				String email = result.getString("email");
-				response.getWriter().append("<tr><td>" + name + "</td><td>" + email + "</td><td>" + phoneNumber + "</td></tr>");
+				sb.append("\t\t\t\t<tr><td>" + name + "</td><td>" + email + "</td><td>" + phoneNumber + "</td></tr>\n");
 			}
-			response.getWriter().append("</tbody></table></body></html>");
+			sb.append("\t\t\t</tbody>\n\t\t</table>\n\t</body>\n</html>");
+			response.getWriter().append(sb.toString());
+			System.out.println(sb.toString());
 			result.close();
 			st.close();
 		} catch (SQLException e) {
