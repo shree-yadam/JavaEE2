@@ -3,6 +3,7 @@ package servlets;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -65,6 +66,8 @@ public class Users extends HttpServlet {
 				response.getWriter().append("<tr><td>" + name + "</td><td>" + email + "</td><td>" + phoneNumber + "</td></tr>");
 			}
 			response.getWriter().append("</tbody></table></body></html>");
+			result.close();
+			st.close();
 		} catch (SQLException e) {
 			System.out.println("SQLException");
 		}
@@ -72,8 +75,28 @@ public class Users extends HttpServlet {
 	}
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
+		try {
+			PreparedStatement pSt = dbConnection.prepareStatement("INSERT INTO users (name, password, email, phone_number) VALUES (?, ?, ?, ?)");
+			
+			String name = request.getParameter("name");
+			String password = request.getParameter("password");
+			String email = request.getParameter("email");
+			String phoneNumber = request.getParameter("phoneNumber");
+			
+			pSt.setString(1, name);
+			pSt.setString(2, password);
+			pSt.setString(3, email);
+			pSt.setString(4, phoneNumber);
+			
+			int numRows = pSt.executeUpdate();
+			
+			System.out.println(numRows + " row added.");
+			
+			response.sendRedirect(request.getContextPath() + "/users");
+		} catch (SQLException e) {
+			System.out.println("SQLException");
+		}
+		
 	}
 
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
