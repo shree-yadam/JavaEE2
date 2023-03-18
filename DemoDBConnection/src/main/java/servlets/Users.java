@@ -146,7 +146,7 @@ public class Users extends HttpServlet {
 			
 			int numRows = pSt.executeUpdate();
 			
-			System.out.println(numRows + " rows updated.");
+			System.out.println(numRows + " row updated.");
 			
 			response.sendRedirect(request.getContextPath() + "/users");
 			pSt.close();
@@ -156,7 +156,22 @@ public class Users extends HttpServlet {
 	}
 
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		try {
+			PreparedStatement pSt = dbConnection.prepareStatement("DELETE FROM users WHERE id = ?");
+			
+			int id = Integer.parseInt(request.getParameter("id"));
+			pSt.setInt(1, id);
+			
+			int numRows = pSt.executeUpdate();
+			
+			System.out.println(numRows + " row deleted.");
+			
+			response.sendRedirect(request.getContextPath() + "/users");
+			pSt.close();
+			
+		} catch (SQLException e) {
+			System.out.println("SQLException " + e);
+		}
 	}
 
 }
