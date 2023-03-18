@@ -95,6 +95,8 @@ public class Users extends HttpServlet {
 			System.out.println(numRows + " row added.");
 			
 			response.sendRedirect(request.getContextPath() + "/users");
+			
+			pSt.close();
 		} catch (SQLException e) {
 			System.out.println("SQLException " + e);
 		}
@@ -109,26 +111,26 @@ public class Users extends HttpServlet {
 		String rPhoneNumber = request.getParameter("phoneNumber");
 		int id = Integer.parseInt(request.getParameter("id"));
 		
-		if(!rName.isEmpty()) {
+		if(rName != null) {
 			sb.append("name = ? WHERE id = ?");
-		} else if(!rEmail.isEmpty()) {
+		} else if(rEmail != null) {
 			sb.append("email = ? WHERE id = ?");
-		} else if(!rPassword.isEmpty()) {
-			sb.append("password = ? WHERE id = ");
-		} else if(!rPhoneNumber.isEmpty()) {
-			sb.append("phone_number = ? WHERE id = ");
+		} else if(rPassword != null) {
+			sb.append("password = ? WHERE id = ?");
+		} else if(rPhoneNumber != null) {
+			sb.append("phone_number = ? WHERE id = ?");
 		}
 		try {
 			PreparedStatement pSt = dbConnection.prepareStatement(sb.toString());
 			
-			if(!rName.isEmpty()) {
+			if(rName != null) {
 				pSt.setString(1, rName);
-			} else if(!rEmail.isEmpty()) {
+			} else if(rEmail != null) {
 				pSt.setString(1, rEmail);
-			} else if(!rPassword.isEmpty()) {
+			} else if(rPassword != null) {
 				pSt.setString(1, rPassword);
-			} else if(!rPhoneNumber.isEmpty()) {
-				pSt.setInt(1, Integer.parseInt(rPhoneNumber));
+			} else if(rPhoneNumber != null) {
+				pSt.setLong(1, Long.parseLong(rPhoneNumber));
 			}
 			
 			pSt.setInt(2, id);
@@ -138,6 +140,7 @@ public class Users extends HttpServlet {
 			System.out.println(numRows + " rows updated.");
 			
 			response.sendRedirect(request.getContextPath() + "/users");
+			pSt.close();
 		} catch (SQLException e) {
 			System.out.println("SQLException " + e);
 		}
