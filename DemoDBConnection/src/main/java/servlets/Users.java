@@ -52,6 +52,15 @@ public class Users extends HttpServlet {
 		}
 	}
 
+	@Override
+	public void destroy() {
+		try {
+			dbConnection.close();
+		} catch (SQLException e) {
+			System.out.println("SQLException " + e);
+		}
+	}
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
 			Statement st = dbConnection.createStatement();
