@@ -44,7 +44,7 @@ public class Items extends HttpServlet {
 				ResultSet rs = st.executeQuery("SELECT * FROM items");
 
 				if (rs.next()) {
-					sb.append("<form method=\"POST\" action=\"/ShoppingProject/orders\">");
+					sb.append("<form method=\"POST\" action=\"/ShoppingProject/order\">");
 					sb.append("<table style=\"border: 1px solid gray \"><tbody>");
 					sb.append("<tr  style=\"border: 1px solid gray \">");
 					sb.append("<td  style=\"border: 1px solid gray \"></td>");
