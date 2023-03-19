@@ -32,7 +32,7 @@ public class Home extends HttpServlet {
 			String name = (String) session.getAttribute("name");
 			sb.append("<h3>Welcome " + name +"!</h3>");
 			sb.append("<p><a href=\""+ contextRoute + "/items\">Shop</a></p>");
-			sb.append("<p><a href=\""+ contextRoute + "/orders\">Order History</a></p>");
+			sb.append("<p><a href=\""+ contextRoute + "/order-history\">Order History</a></p>");
 			sb.append("</br></br><form action=\"" + contextRoute + "/logout\" method=\"post\"><button type=\"submit\">Logout</button></form>");
 			
 		} else {
