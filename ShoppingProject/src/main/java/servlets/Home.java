@@ -26,18 +26,20 @@ public class Home extends HttpServlet {
 		String contextRoute = request.getContextPath();
 		
 
-		StringBuffer sb = new StringBuffer("<html>\n\t<body>\n\t\t\n");
+		StringBuffer sb = new StringBuffer("<html><body>");
 		
 		if(session != null) {
 			String name = (String) session.getAttribute("name");
-			sb.append("\t\t\t<h3>Welcome " + name +"!</h3>\n");
-			sb.append("<p><a href=\""+ contextRoute + "/items\">Shop</a></p>\n");
-			sb.append("<p><a href=\""+ contextRoute + "/orders\">Order History</a></p>\n");
-			sb.append("</br></br><form action=\"" + contextRoute + "/logout\" method=\"post\"><button type=\"submit\">Logout</button></form>\n");
-			sb.append("\t</body>\n</html>\n");
+			sb.append("<h3>Welcome " + name +"!</h3>");
+			sb.append("<p><a href=\""+ contextRoute + "/items\">Shop</a></p>");
+			sb.append("<p><a href=\""+ contextRoute + "/orders\">Order History</a></p>");
+			sb.append("</br></br><form action=\"" + contextRoute + "/logout\" method=\"post\"><button type=\"submit\">Logout</button></form>");
+			
 		} else {
-			sb.append("\t\t\t<h3> Please <a href=\""+ contextRoute + "/login.html\">login</a> to continue</h3>\n");
+			sb.append("<h3> Please <a href=\""+ contextRoute + "/login.html\">login</a> to continue</h3>");
 		}
+		
+		sb.append("</body></html>");
 
 		response.getWriter().append(sb.toString());
 	}
