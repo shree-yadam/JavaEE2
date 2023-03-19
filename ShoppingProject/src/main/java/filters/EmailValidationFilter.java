@@ -11,7 +11,7 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpFilter;
 import javax.servlet.http.HttpServletRequest;
 
-@WebFilter("/register")
+@WebFilter({ "/register", "/login" })
 public class EmailValidationFilter extends HttpFilter implements Filter {
        
     private static final long serialVersionUID = 1L;
