@@ -69,7 +69,7 @@ public class Items extends HttpServlet {
 						sb.append("<td  style=\"border: 1px solid gray \"><h5>" + price + "</h5></td>");
 						sb.append("<td  style=\"border: 1px solid gray \"><input type=\"number\" min=\"0\" max=\""
 								+ quantity + "\" id=\"" + id + "\" name=\"" + id + "\" value=0></td>");
-						sb.append("<tr>");
+						sb.append("</tr>");
 
 					} while (rs.next());
 					sb.append("<tr>");
@@ -77,6 +77,7 @@ public class Items extends HttpServlet {
 							+ "/home';\">Back</button></td>");
 					sb.append("<td></td><td></td>");
 					sb.append("<td><button type=\"submit\">Purchase</button></td>");
+					sb.append("</tr>");
 					sb.append("</tbody></table>");
 
 					sb.append("</form>");
