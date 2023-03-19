@@ -9,7 +9,7 @@ public class DatabaseConnection {
 	
 	private static DatabaseConnection db = null;
 	
-	Connection dbConn = null;
+	private Connection dbConn = null;
 	
 	private DatabaseConnection() {
 		// Initialize all the information regarding
@@ -18,7 +18,7 @@ public class DatabaseConnection {
         String dbDriver = Optional.ofNullable(System.getenv("DB_DRIVER")).orElse("");
         String dbURL = Optional.ofNullable(System.getenv("DB_URL")).orElse("");
         // Database name to access
-        String dbName = Optional.ofNullable(System.getenv("DEMO_DB_NAME")).orElse("");;
+        String dbName = Optional.ofNullable(System.getenv("SHOPPING_DB_NAME")).orElse("");;
         String dbUsername = Optional.ofNullable(System.getenv("DB_USER")).orElse("");;
         String dbPassword = Optional.ofNullable(System.getenv("DB_PASSWORD")).orElse("");;
         
@@ -56,6 +56,10 @@ public class DatabaseConnection {
 		}
 		
 		return db;
+	}
+
+	public final Connection getDbConn() {
+		return dbConn;
 	}
 
 }
