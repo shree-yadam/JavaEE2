@@ -81,6 +81,9 @@ public class Items extends HttpServlet {
 
 					sb.append("</form>");
 				}
+
+				rs.close();
+				st.close();
 			} catch (SQLException e) {
 				System.out.println("SQLException " + e);
 			}

@@ -47,6 +47,7 @@ public class Register extends HttpServlet {
 			session.setAttribute("name", name);
 			session.setAttribute("email", email);
 			
+			pSt.close();
 			response.sendRedirect("/ShoppingProject/home");
 		} catch (SQLException e) {
 			System.out.println("SQLException " + e);

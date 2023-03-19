@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -61,6 +60,8 @@ public class Login extends HttpServlet {
 					response.getWriter().append(sb.toString());
 				}
 			}
+			rs.close();
+			pSt.close();
 		} catch (SQLException e) {
 			System.out.println("SQLException " + e);
 		}
