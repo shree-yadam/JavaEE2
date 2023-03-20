@@ -1,13 +1,19 @@
 package servlets;
 
 import java.io.IOException;
+import model.ItemDetails;
+import model.OrderDetails;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -33,12 +39,51 @@ public class OrderHistory extends HttpServlet {
 		StringBuffer sb = new StringBuffer("<html><body>");
 		String contextRoute = request.getContextPath();
 		
-		if(session != null) {
+		if(session != null  && session.getAttribute("email") != null) {
 			
 			Connection conn = db.getDbConn();
 			
 			String email = (String) session.getAttribute("email");
 			int userId = getUserIdForEmail(conn, email);
+			
+			Map<OrderDetails, List<ItemDetails>> orderMap = new HashMap<>();
+			
+			try {
+				PreparedStatement pSt = conn.prepareStatement("SELECT o.id, o.user_id, o.total,o.timestamp, oi.quantity, i.name, i.price FROM orders o JOIN order_items oi ON o.id = oi.order_id JOIN items i ON i.id = oi.item_id WHERE user_id = ? ORDER BY timestamp DESC, id");
+				pSt.setInt(1, userId);
+				
+				ResultSet rs = pSt.executeQuery();
+				
+				if(rs.next()) {
+					
+					do {
+						
+						
+						Date orderDateTime = rs.getTimestamp("timestamp");
+						double orderTotal = ((double)rs.getInt("total")) / 100;
+						
+						OrderDetails od = new OrderDetails(rs.getInt("id"), rs.getInt("user_id"), orderTotal, orderDateTime);
+						ItemDetails itmDetails = new ItemDetails(rs.getInt("quantity"), rs.getString("name"), ((double)rs.getInt("price")) / 100);
+						
+						if(orderMap.containsKey(od)) {
+							List<ItemDetails> items = orderMap.get(od);
+							items.add(itmDetails);
+							orderMap.replace(od, items);
+						} else {
+							List<ItemDetails> items = new ArrayList<ItemDetails>();
+							items.add(itmDetails);
+							orderMap.put(od, items);
+						}
+					} while (rs.next());
+				}
+				
+				rs.close();
+				pSt.close();
+				
+				
+			} catch (SQLException e) {
+				System.out.println("SQLException " + e);
+			}
 			
 			sb.append("<table style=\"border: 1px solid gray \"><tbody>");
 			sb.append("<tr  style=\"border: 1px solid gray \">");
@@ -47,40 +92,24 @@ public class OrderHistory extends HttpServlet {
 			sb.append("<td  style=\"border: 1px solid gray; color: blue \"><h2>Total Price</h2></td>");
 			sb.append("</tr>");
 			
-			try {
-				PreparedStatement pSt = conn.prepareStatement("SELECT o.id, o.total, o.timestamp FROM orders o JOIN order_items oi ON o.id = oi.order_id WHERE user_id = ? GROUP BY o.id");
-				pSt.setInt(1, userId);
+			for(Entry<OrderDetails, List<ItemDetails>> entry: orderMap.entrySet()) {
+				OrderDetails od = entry.getKey();
+				List<ItemDetails> itemList = entry.getValue();
+				String orderDateString = new SimpleDateFormat("yyyy-MM-dd").format(od.getOrderDateTime());
+				String orderTimeString = new SimpleDateFormat("HH:mm:ss").format(od.getOrderDateTime());
 				
-				ResultSet rs = pSt.executeQuery();
-				
-				if(rs.next()) {
-					
-					do {
-						Date orderDateTime = rs.getTimestamp("timestamp");
-						String orderDateString = new SimpleDateFormat("yyyy-MM-dd").format(orderDateTime);
-						String orderTimeString = new SimpleDateFormat("HH:mm:ss").format(orderDateTime);
-						double orderTotal = ((double)rs.getInt("total")) / 100;
-						
-						sb.append("<tr style=\"margin: 20px 0;border: 1px solid gray \">");
-						sb.append("<td  style=\"border: 1px solid gray \"><h5>" + orderDateString + "</h5></td>");
-						sb.append("<td  style=\"border: 1px solid gray \"><h5>" +  orderTimeString + "</h5></td>");
-						sb.append("<td  style=\"border: 1px solid gray \"><h5>" +  orderTotal + "</h5></td>");
-						sb.append("</tr>");
-						
-					} while (rs.next());
-				}
-				
-				rs.close();
-				pSt.close();
-				sb.append("<tr>");
-				sb.append("<td><button type=\"button\" onclick=\"window.location.href='" + contextRoute
-						+ "/home';\">Back</button></td>");
-				sb.append("<td></td><td></td><td></td>");
+				sb.append("<tr style=\"margin: 20px 0;border: 1px solid gray \">");
+				sb.append("<td  style=\"border: 1px solid gray \"><h5>" + orderDateString + "</h5></td>");
+				sb.append("<td  style=\"border: 1px solid gray \"><h5>" +  orderTimeString + "</h5></td>");
+				sb.append("<td  style=\"border: 1px solid gray \"><h5>" +  od.getTotal() + "</h5></td>");
 				sb.append("</tr>");
-				sb.append("</tbody></table>");
-			} catch (SQLException e) {
-				System.out.println("SQLException " + e);
 			}
+			sb.append("<tr>");
+			sb.append("<td><button type=\"button\" onclick=\"window.location.href='" + contextRoute
+					+ "/home';\">Back</button></td>");
+			sb.append("<td></td><td></td><td></td>");
+			sb.append("</tr>");
+			sb.append("</tbody></table>");
 			
 		} else {
 			sb.append("<h3> Please <a href=\"" + contextRoute + "/login.html\">login</a> to continue</h3>");
