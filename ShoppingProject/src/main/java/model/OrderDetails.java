@@ -1,6 +1,8 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class OrderDetails {
 	
@@ -11,6 +13,8 @@ public class OrderDetails {
 	double total;
 	
 	Date orderDateTime;
+	
+	List<ItemDetails> items;
 
 	public OrderDetails(int id, int userId, double total, Date orderDateTime) {
 		super();
@@ -18,6 +22,7 @@ public class OrderDetails {
 		this.userId = userId;
 		this.total = total;
 		this.orderDateTime = orderDateTime;
+		this.items = new ArrayList<>();
 	}
 
 	public int getId() {
@@ -39,6 +44,16 @@ public class OrderDetails {
 	@Override
 	public int hashCode() {
 		return id;
+	}
+	
+	
+
+	public List<ItemDetails> getItems() {
+		return items;
+	}
+
+	public void addItem(ItemDetails item) {
+		this.items.add(item);
 	}
 
 	@Override

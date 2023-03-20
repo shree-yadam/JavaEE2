@@ -46,7 +46,7 @@ public class OrderHistory extends HttpServlet {
 			String email = (String) session.getAttribute("email");
 			int userId = getUserIdForEmail(conn, email);
 			
-			Map<OrderDetails, List<ItemDetails>> orderMap = new HashMap<>();
+			List<OrderDetails> orderList = new ArrayList<>();
 			
 			try {
 				PreparedStatement pSt = conn.prepareStatement("SELECT o.id, o.user_id, o.total,o.timestamp, oi.quantity, i.name, i.price FROM orders o JOIN order_items oi ON o.id = oi.order_id JOIN items i ON i.id = oi.item_id WHERE user_id = ? ORDER BY timestamp DESC, id");
@@ -64,16 +64,9 @@ public class OrderHistory extends HttpServlet {
 						
 						OrderDetails od = new OrderDetails(rs.getInt("id"), rs.getInt("user_id"), orderTotal, orderDateTime);
 						ItemDetails itmDetails = new ItemDetails(rs.getInt("quantity"), rs.getString("name"), ((double)rs.getInt("price")) / 100);
+						od.addItem(itmDetails);
+						orderList.add(od);
 						
-						if(orderMap.containsKey(od)) {
-							List<ItemDetails> items = orderMap.get(od);
-							items.add(itmDetails);
-							orderMap.replace(od, items);
-						} else {
-							List<ItemDetails> items = new ArrayList<ItemDetails>();
-							items.add(itmDetails);
-							orderMap.put(od, items);
-						}
 					} while (rs.next());
 				}
 				
@@ -92,16 +85,15 @@ public class OrderHistory extends HttpServlet {
 			sb.append("<td  style=\"border: 1px solid gray; color: blue \"><h2>Total Price</h2></td>");
 			sb.append("</tr>");
 			
-			for(Entry<OrderDetails, List<ItemDetails>> entry: orderMap.entrySet()) {
-				OrderDetails od = entry.getKey();
-				List<ItemDetails> itemList = entry.getValue();
-				String orderDateString = new SimpleDateFormat("yyyy-MM-dd").format(od.getOrderDateTime());
-				String orderTimeString = new SimpleDateFormat("HH:mm:ss").format(od.getOrderDateTime());
+			for(OrderDetails order: orderList) {
+				List<ItemDetails> itemList = order.getItems();
+				String orderDateString = new SimpleDateFormat("yyyy-MM-dd").format(order.getOrderDateTime());
+				String orderTimeString = new SimpleDateFormat("HH:mm:ss").format(order.getOrderDateTime());
 				
 				sb.append("<tr style=\"margin: 20px 0;border: 1px solid gray \">");
 				sb.append("<td  style=\"border: 1px solid gray \"><h5>" + orderDateString + "</h5></td>");
 				sb.append("<td  style=\"border: 1px solid gray \"><h5>" +  orderTimeString + "</h5></td>");
-				sb.append("<td  style=\"border: 1px solid gray \"><h5>" +  od.getTotal() + "</h5></td>");
+				sb.append("<td  style=\"border: 1px solid gray \"><h5>" +  order.getTotal() + "</h5></td>");
 				sb.append("</tr>");
 			}
 			sb.append("<tr>");
