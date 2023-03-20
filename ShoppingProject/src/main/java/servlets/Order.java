@@ -37,7 +37,7 @@ public class Order extends HttpServlet {
 
 		String contextRoute = request.getContextPath();
 		
-		if(session != null ){
+		if(session != null  && session.getAttribute("email") != null){
 			Map<String, String[]> itemsMap = request.getParameterMap();
 			int numItems = 0;
 	

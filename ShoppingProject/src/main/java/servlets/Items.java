@@ -34,7 +34,7 @@ public class Items extends HttpServlet {
 
 		String contextRoute = request.getContextPath();
 
-		if (session != null) {
+		if (session != null && session.getAttribute("email") != null) {
 
 			Connection conn = db.getDbConn();
 

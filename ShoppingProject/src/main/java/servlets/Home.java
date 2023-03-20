@@ -28,7 +28,7 @@ public class Home extends HttpServlet {
 
 		StringBuffer sb = new StringBuffer("<html><body>");
 		
-		if(session != null) {
+		if(session != null && session.getAttribute("email") != null) {
 			String name = (String) session.getAttribute("name");
 			sb.append("<h3>Welcome " + name +"!</h3>");
 			sb.append("<p><a href=\""+ contextRoute + "/items\">Shop</a></p>");

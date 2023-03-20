@@ -23,6 +23,8 @@ public class Logout extends HttpServlet {
 		HttpSession session = request.getSession(false);
 		
 		if(session != null) {
+			session.removeAttribute("name");
+			session.removeAttribute("email");
 			session.setMaxInactiveInterval(0);
 		}
 		
