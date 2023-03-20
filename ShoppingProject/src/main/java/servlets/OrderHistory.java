@@ -46,7 +46,7 @@ public class OrderHistory extends HttpServlet {
 			String email = (String) session.getAttribute("email");
 			int userId = getUserIdForEmail(conn, email);
 			
-			List<OrderDetails> orderList = new ArrayList<>();
+			Map<Integer, OrderDetails> orderMap = new HashMap<>();
 			
 			try {
 				PreparedStatement pSt = conn.prepareStatement("SELECT o.id, o.user_id, o.total,o.timestamp, oi.quantity, i.name, i.price FROM orders o JOIN order_items oi ON o.id = oi.order_id JOIN items i ON i.id = oi.item_id WHERE user_id = ? ORDER BY timestamp DESC, id");
@@ -64,8 +64,13 @@ public class OrderHistory extends HttpServlet {
 						
 						OrderDetails od = new OrderDetails(rs.getInt("id"), rs.getInt("user_id"), orderTotal, orderDateTime);
 						ItemDetails itmDetails = new ItemDetails(rs.getInt("quantity"), rs.getString("name"), ((double)rs.getInt("price")) / 100);
-						od.addItem(itmDetails);
-						orderList.add(od);
+						if(orderMap.containsKey(od.getId())) {
+							od = orderMap.get(od.getId());
+							od.addItem(itmDetails);
+						} else {
+							od.addItem(itmDetails);
+							orderMap.put(od.getId(), od);
+						}
 						
 					} while (rs.next());
 				}
@@ -78,28 +83,49 @@ public class OrderHistory extends HttpServlet {
 				System.out.println("SQLException " + e);
 			}
 			
-			sb.append("<table style=\"border: 1px solid gray \"><tbody>");
-			sb.append("<tr  style=\"border: 1px solid gray \">");
-			sb.append("<td  style=\"border: 1px solid gray; color: blue \"><h2>Order Date<h2></td>");
-			sb.append("<td  style=\"border: 1px solid gray; color: blue \"><h2>Order Time</h2></td>");
-			sb.append("<td  style=\"border: 1px solid gray; color: blue \"><h2>Total Price</h2></td>");
+			sb.append("<table style=\"border: 1px solid gray; border-collapse: collapse; \"><tbody>");
+			sb.append("<tr  style=\"border: 1px solid gray; border-collapse: collapse; \">");
+			sb.append("<td  style=\"border: 1px solid gray; color: blue; border-collapse: collapse; \"><h2>Order #<h2></td>");
+			sb.append("<td  style=\"border: 1px solid gray; color: blue; border-collapse: collapse; \"><h2>Order Date<h2></td>");
+			sb.append("<td  style=\"border: 1px solid gray; color: blue; border-collapse: collapse; \"><h2>Order Time</h2></td>");
+			sb.append("<td  style=\"border: 1px solid gray; color: blue; border-collapse: collapse; \"><h2>Items</h2></td>");
+			sb.append("<td  style=\"border: 1px solid gray; color: blue; border-collapse: collapse; \"><h2>Total Price</h2></td>");
 			sb.append("</tr>");
 			
-			for(OrderDetails order: orderList) {
+			for(Map.Entry<Integer, OrderDetails> entry: orderMap.entrySet()) {
+				OrderDetails order = entry.getValue(); 
 				List<ItemDetails> itemList = order.getItems();
 				String orderDateString = new SimpleDateFormat("yyyy-MM-dd").format(order.getOrderDateTime());
 				String orderTimeString = new SimpleDateFormat("HH:mm:ss").format(order.getOrderDateTime());
 				
-				sb.append("<tr style=\"margin: 20px 0;border: 1px solid gray \">");
-				sb.append("<td  style=\"border: 1px solid gray \"><h5>" + orderDateString + "</h5></td>");
-				sb.append("<td  style=\"border: 1px solid gray \"><h5>" +  orderTimeString + "</h5></td>");
-				sb.append("<td  style=\"border: 1px solid gray \"><h5>" +  order.getTotal() + "</h5></td>");
+				sb.append("<tr style=\"margin: 20px 0;border: 1px solid gray; border-collapse: collapse; \">");
+				sb.append("<td  style=\"border: 1px solid gray; border-collapse: collapse; \"><h5>" + order.getId() + "</h5></td>");
+				sb.append("<td  style=\"border: 1px solid gray; border-collapse: collapse; \"><h5>" + orderDateString + "</h5></td>");
+				sb.append("<td  style=\"border: 1px solid gray; border-collapse: collapse; \"><h5>" +  orderTimeString + "</h5></td>");
+				sb.append("<td  style=\"border: 1px solid gray; border-collapse: collapse; \">");
+				sb.append("<table style=\"border: 1px solid gray; border-collapse: collapse; \"><tbody>");
+				//sb.append("<tr  style=\"border: 1px solid gray \">");
+				//sb.append("<td  style=\"border: 1px solid gray; color: blue \"><h2>Item<h2></td>");
+				//sb.append("<td  style=\"border: 1px solid gray; color: blue \"><h2>Quantity<h2></td>");
+				//sb.append("<td  style=\"border: 1px solid gray; color: blue \"><h2>Price</h2></td>");
+				//sb.append("</tr>");
+				
+				for(ItemDetails item: itemList) {
+					sb.append("<tr style=\"margin: 20px 0;border: 1px solid gray; border-collapse: collapse; \">");
+					sb.append("<td  style=\"border: 1px solid gray; border-collapse: collapse; \"><h5>" + item.getItemName() + "</h5></td>");
+					sb.append("<td  style=\"border: 1px solid gray; border-collapse: collapse; \"><h5>" + item.getQuantity() + "</h5></td>");
+					sb.append("<td  style=\"border: 1px solid gray; border-collapse: collapse; \"><h5>" +  item.getItemPrice() + "</h5></td>");
+					sb.append("</tr>");
+				}
+				sb.append("</tbody></table>");
+				sb.append("</td>");
+				sb.append("<td  style=\"border: 1px solid gray ; border-collapse: collapse;\"><h5>" +  order.getTotal() + "</h5></td>");
 				sb.append("</tr>");
 			}
 			sb.append("<tr>");
 			sb.append("<td><button type=\"button\" onclick=\"window.location.href='" + contextRoute
 					+ "/home';\">Back</button></td>");
-			sb.append("<td></td><td></td><td></td>");
+			sb.append("<td></td><td></td><td></td><td></td>");
 			sb.append("</tr>");
 			sb.append("</tbody></table>");
 			
