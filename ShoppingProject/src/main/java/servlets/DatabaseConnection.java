@@ -7,8 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
-import javax.servlet.http.HttpSession;
-
 import model.User;
 
 public class DatabaseConnection {
@@ -90,5 +88,7 @@ public class DatabaseConnection {
 		
 		return user;
 	}
+	
+	
 
 }
