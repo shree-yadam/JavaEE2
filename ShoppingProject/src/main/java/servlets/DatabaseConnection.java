@@ -7,8 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
-import javax.servlet.http.HttpSession;
-
 import model.User;
 
 public class DatabaseConnection {
@@ -91,7 +89,7 @@ public class DatabaseConnection {
 		return user;
 	}
 	
-	public void registerUser(User user) {
+	synchronized public void registerUser(User user) {
 		 
 		try {
 			PreparedStatement pSt = dbConn.prepareStatement("INSERT into users (name, password, phone_number, email) VALUES (?, ? , ?, ?)");
