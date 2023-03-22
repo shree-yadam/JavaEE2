@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
+import javax.servlet.http.HttpSession;
+
 import model.User;
 
 public class DatabaseConnection {
@@ -89,6 +91,25 @@ public class DatabaseConnection {
 		return user;
 	}
 	
-	
+	public void registerUser(User user) {
+		 
+		try {
+			PreparedStatement pSt = dbConn.prepareStatement("INSERT into users (name, password, phone_number, email) VALUES (?, ? , ?, ?)");
+			pSt.setString(1, user.getName());
+			pSt.setString(2, user.getPassword());
+			pSt.setString(3, user.getPhoneNumber());
+			pSt.setString(4, user.getEmail());
+			
+			int numRows = pSt.executeUpdate();
+			
+			System.out.println(numRows + "users registered.");
+			pSt.close();
+		} catch (SQLException e) {
+			System.out.println("registerUser : SQLException " + e);
+			// TODO how to respond with error
+		}
+		
+		
+	}
 
 }
