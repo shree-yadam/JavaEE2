@@ -2,8 +2,14 @@ package servlets;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
+
+import javax.servlet.http.HttpSession;
+
+import model.User;
 
 public class DatabaseConnection {
 	
@@ -60,6 +66,29 @@ public class DatabaseConnection {
 
 	public final Connection getDbConn() {
 		return dbConn;
+	}
+	
+	public User getUserForEmail(String email) {
+		PreparedStatement pSt;
+		User user = null;
+		try {
+			pSt = dbConn.prepareStatement("SELECT * FROM users WHERE email = ?");
+			pSt.setString(1, email);
+			
+			ResultSet rs = pSt.executeQuery();
+			
+			while(rs.next()) {
+				user = new User(rs.getString("name"), email, rs.getString("phone_number"), rs.getString("password"));
+				
+			}
+			rs.close();
+			pSt.close();
+		} catch (SQLException e) {
+			System.out.println("getUserForEmail : SQLException " + e);
+		}
+
+		
+		return user;
 	}
 
 }
