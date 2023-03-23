@@ -5,8 +5,12 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
+import model.Item;
 import model.User;
 
 public class DatabaseConnection {
@@ -108,6 +112,43 @@ public class DatabaseConnection {
 		}
 		
 		
+	}
+	
+	public List<Item> getAllItems() {
+		Statement st;
+		
+		List<Item> result = new ArrayList<>();
+		try {
+			st = dbConn.createStatement();
+			ResultSet rs = st.executeQuery("SELECT * FROM items");
+			while (rs.next()) {
+				Integer id = rs.getInt("id");
+				String name = rs.getString("name");
+				Double price = ((double) rs.getInt("price")) / 100;
+				String description = rs.getString("description");
+				String imgURL = rs.getString("img_url");
+				Integer quantity = rs.getInt("quantity");
+				
+				Item item = new Item();
+				item.setId(id);
+				item.setName(name);
+				item.setPrice(price);
+				item.setQuantity(quantity);
+				item.setDescription(description);
+				item.setImgURL(imgURL);
+				
+				result.add(item);
+			}
+
+			rs.close();
+			st.close();
+		} catch (SQLException e) {
+			System.out.println("getAllItems : SQLException " + e);
+			// TODO how to respond with error
+		}
+		
+		return result;
+
 	}
 
 }
