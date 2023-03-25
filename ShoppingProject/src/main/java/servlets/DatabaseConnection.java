@@ -8,7 +8,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Map.Entry;
 
 import model.Item;
 import model.User;
@@ -149,6 +151,100 @@ public class DatabaseConnection {
 		
 		return result;
 
+	}
+	
+	public int createOrder(int totalValue, int userId) {
+		int orderId = -1;
+		try {
+			
+			String insertOrder = "INSERT INTO orders (user_id, total) VALUES (?, ?)";
+			PreparedStatement pSt = dbConn.prepareStatement(insertOrder, Statement.RETURN_GENERATED_KEYS);
+			
+			pSt.setInt(1, userId);
+			pSt.setInt(2, totalValue);
+			
+			pSt.execute();
+			
+			ResultSet rs = pSt.getGeneratedKeys();
+			
+			if (rs.next()) {
+				orderId = rs.getInt(1);
+			}
+			
+			rs.close();
+			pSt.close();
+		} catch (SQLException e) {
+			System.out.println("SQLException " + e);
+		}
+		
+		return orderId;
+	}
+	
+	public void createOrderItemEntries(Map<String, String[]> itemsMap, int orderId) {
+		String orderItems = "INSERT INTO order_items (order_id, item_id, quantity) VALUES (?, ?, ?)";
+
+
+		for(Entry<String, String[]> itemsEntry: itemsMap.entrySet()) {
+			if(Integer.parseInt(itemsEntry.getValue()[0]) > 0) {
+		
+				try {
+					PreparedStatement pSt = dbConn.prepareStatement(orderItems.toString());
+					pSt.setInt(1, orderId);
+					pSt.setInt(2, Integer.parseInt(itemsEntry.getKey()));
+					pSt.setInt(3,Integer.parseInt(itemsEntry.getValue()[0]));
+					
+					int numRows = pSt.executeUpdate();
+					
+					
+					System.out.println("Inserted " + numRows + " order items.");
+					
+					pSt.close();
+				} catch (SQLException e) {
+					System.out.println("SQLException " + e);
+				}
+			}
+		}
+	}
+	
+	public int getUserIDForUser(String email) {
+		int userId = -1;
+		try {
+			PreparedStatement pSt = dbConn.prepareStatement("SELECT id FROM users WHERE email = ?");
+			
+			pSt.setString(1, email);
+			
+			ResultSet rs = pSt.executeQuery();
+			
+			if(rs.next()) {
+				userId = rs.getInt("id");
+			}
+			rs.close();
+			pSt.close();
+		} catch (SQLException e) {
+			System.out.println("SQLException " + e);
+		}
+		return userId;
+	}
+	
+	public Integer getPriceForItem(String item_id) {
+		Integer price = 0;
+		PreparedStatement pSt;
+		try {
+			pSt = dbConn.prepareStatement("SELECT price FROM items WHERE id = ?");
+			pSt.setString(1, item_id);
+			
+			ResultSet rs = pSt.executeQuery();
+			
+			if(rs.next()) {
+				 price = rs.getInt("price");
+			}
+			
+			rs.close();
+			pSt.close();
+		} catch (SQLException e) {
+			System.out.println("SQLException " + e);
+		}
+		return price;
 	}
 
 }
