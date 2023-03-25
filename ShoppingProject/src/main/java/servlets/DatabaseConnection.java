@@ -76,6 +76,11 @@ public class DatabaseConnection {
 		return dbConn;
 	}
 	
+	/**
+	 * Get user by email
+	 * @param email
+	 * @return
+	 */
 	public User getUserForEmail(String email) {
 		PreparedStatement pSt;
 		User user = null;
@@ -99,6 +104,10 @@ public class DatabaseConnection {
 		return user;
 	}
 	
+	/**
+	 * Add user to database
+	 * @param user
+	 */
 	synchronized public void registerUser(User user) {
 		 
 		try {
@@ -120,13 +129,17 @@ public class DatabaseConnection {
 		
 	}
 	
+	/**
+	 * Get all the items available
+	 * @return
+	 */
 	public List<Item> getAllItems() {
 		Statement st;
 		
 		List<Item> result = new ArrayList<>();
 		try {
 			st = dbConn.createStatement();
-			ResultSet rs = st.executeQuery("SELECT * FROM items");
+			ResultSet rs = st.executeQuery("SELECT * FROM items WHERE quantity > 0");
 			while (rs.next()) {
 				Integer id = rs.getInt("id");
 				String name = rs.getString("name");
@@ -157,6 +170,12 @@ public class DatabaseConnection {
 
 	}
 	
+	/**
+	 * Add a new order to order table
+	 * @param totalValue
+	 * @param userId
+	 * @return
+	 */
 	synchronized public int createOrder(int totalValue, int userId) {
 		int orderId = -1;
 		try {
@@ -184,6 +203,11 @@ public class DatabaseConnection {
 		return orderId;
 	}
 	
+	/**
+	 * Add entry to order_item table when creating an order
+	 * @param itemsMap
+	 * @param orderId
+	 */
 	synchronized public void createOrderItemEntries(Map<String, String[]> itemsMap, int orderId) {
 		String orderItems = "INSERT INTO order_items (order_id, item_id, quantity) VALUES (?, ?, ?)";
 
@@ -210,6 +234,11 @@ public class DatabaseConnection {
 		}
 	}
 	
+	/**
+	 * Get user ID by email
+	 * @param email
+	 * @return user ID
+	 */
 	public int getUserIDForEmail(String email) {
 		int userId = -1;
 		try {
@@ -230,6 +259,11 @@ public class DatabaseConnection {
 		return userId;
 	}
 	
+	/**
+	 * Get price of an item by item ID
+	 * @param item_id
+	 * @return price in cents
+	 */
 	public Integer getPriceForItem(String item_id) {
 		Integer price = 0;
 		PreparedStatement pSt;
@@ -251,6 +285,11 @@ public class DatabaseConnection {
 		return price;
 	}
 	
+	/**
+	 * Get all the order for a particular user by user ID
+	 * @param userId
+	 * @return List of orders
+	 */
 	public List<OrderDetails> getAllOrdersForUser(int userId) {
 		
 		Map<Integer, OrderDetails> orderMap = new HashMap<>();
