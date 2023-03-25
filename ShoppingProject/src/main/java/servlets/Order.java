@@ -51,13 +51,14 @@ public class Order extends HttpServlet {
 		int totalValue = 0;
 		for (Entry<String, String[]> entry : itemsMap.entrySet()) {
 			System.out.println("item: " + entry.getKey() + " quantity: " + entry.getValue()[0]);
-			String item_id = entry.getKey();
+			String itemId = entry.getKey();
 			int quantity = Integer.parseInt(entry.getValue()[0]);
 			double price = 0;
 			if (quantity > 0) {
 
 				numItems++;
-				price = DatabaseConnection.getInstance().getPriceForItem(item_id);
+				price = DatabaseConnection.getInstance().getPriceForItem(itemId);
+				DatabaseConnection.getInstance().updateItemQuantity(Integer.parseInt(itemId), quantity);
 			}
 
 			totalValue += price * quantity;
