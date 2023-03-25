@@ -251,9 +251,10 @@ public class DatabaseConnection {
 		return price;
 	}
 	
-	public Map<Integer, OrderDetails> getAllOrdersForUser(int userId) {
+	public List<OrderDetails> getAllOrdersForUser(int userId) {
 		
 		Map<Integer, OrderDetails> orderMap = new HashMap<>();
+		List<OrderDetails> ordersList = new ArrayList<>();
 		try {
 			PreparedStatement pSt = dbConn.prepareStatement("SELECT o.id, o.user_id, o.total,o.timestamp, oi.quantity, i.name, i.price FROM orders o JOIN order_items oi ON o.id = oi.order_id JOIN items i ON i.id = oi.item_id WHERE user_id = ? ORDER BY timestamp DESC, id");
 			pSt.setInt(1, userId);
@@ -276,6 +277,8 @@ public class DatabaseConnection {
 					} else {
 						od.addItem(itmDetails);
 						orderMap.put(od.getId(), od);
+						ordersList.add(od);
+						
 					}
 					
 				} while (rs.next());
@@ -288,7 +291,7 @@ public class DatabaseConnection {
 		} catch (SQLException e) {
 			System.out.println("SQLException " + e);
 		}
-		return orderMap;
+		return ordersList;
 	}
 
 }

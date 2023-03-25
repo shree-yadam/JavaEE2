@@ -5,7 +5,6 @@ import model.ItemDetails;
 import model.OrderDetails;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -29,9 +28,9 @@ public class OrderHistory extends HttpServlet {
 			String email = (String) session.getAttribute("email");
 			int userId = DatabaseConnection.getInstance().getUserIDForEmail(email);
 			
-			Map<Integer, OrderDetails> orderMap = DatabaseConnection.getInstance().getAllOrdersForUser(userId);
+			List<OrderDetails> orderList = DatabaseConnection.getInstance().getAllOrdersForUser(userId);
 			
-			createHTMLOrderDisplay(sb, contextRoute, orderMap);
+			createHTMLOrderDisplay(sb, contextRoute, orderList);
 			
 		} else {
 			sb.append("<h3> Please <a href=\"" + contextRoute + "/login.html\">login</a> to continue</h3>");
@@ -43,7 +42,7 @@ public class OrderHistory extends HttpServlet {
 		
 	}
 
-	private void createHTMLOrderDisplay(StringBuffer sb, String contextRoute, Map<Integer, OrderDetails> orderMap) {
+	private void createHTMLOrderDisplay(StringBuffer sb, String contextRoute, List<OrderDetails> orderList) {
 		sb.append("<table style=\"border: 1px solid gray; border-collapse: collapse; \"><tbody>");
 		sb.append("<tr  style=\"border: 1px solid gray; border-collapse: collapse; \">");
 		sb.append("<td  style=\"border: 1px solid gray; color: blue; border-collapse: collapse; \"><h2>Order #<h2></td>");
@@ -53,8 +52,7 @@ public class OrderHistory extends HttpServlet {
 		sb.append("<td  style=\"border: 1px solid gray; color: blue; border-collapse: collapse; \"><h2>Total Price</h2></td>");
 		sb.append("</tr>");
 		
-		for(Map.Entry<Integer, OrderDetails> entry: orderMap.entrySet()) {
-			OrderDetails order = entry.getValue(); 
+		for(OrderDetails order: orderList) {
 			List<ItemDetails> itemList = order.getItems();
 			String orderDateString = new SimpleDateFormat("yyyy-MM-dd").format(order.getOrderDateTime());
 			String orderTimeString = new SimpleDateFormat("HH:mm:ss").format(order.getOrderDateTime());
