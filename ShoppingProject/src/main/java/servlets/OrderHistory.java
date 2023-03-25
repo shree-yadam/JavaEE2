@@ -3,13 +3,7 @@ package servlets;
 import java.io.IOException;
 import model.ItemDetails;
 import model.OrderDetails;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,13 +17,6 @@ import javax.servlet.http.HttpSession;
 @WebServlet("/order-history")
 public class OrderHistory extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-	private DatabaseConnection db = null;
-	
-    public OrderHistory() {
-        super();
-		db = DatabaseConnection.getInstance();
-    }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession(false);
@@ -39,14 +26,10 @@ public class OrderHistory extends HttpServlet {
 		
 		if(session != null  && session.getAttribute("email") != null) {
 			
-			Connection conn = db.getDbConn();
-			
 			String email = (String) session.getAttribute("email");
-			int userId = getUserIdForEmail(conn, email);
+			int userId = DatabaseConnection.getInstance().getUserIDForEmail(email);
 			
-			Map<Integer, OrderDetails> orderMap = new HashMap<>();
-			
-			getOrdersFromDatabase(conn, userId, orderMap);
+			Map<Integer, OrderDetails> orderMap = DatabaseConnection.getInstance().getAllOrdersForUser(userId);
 			
 			createHTMLOrderDisplay(sb, contextRoute, orderMap);
 			
@@ -105,64 +88,6 @@ public class OrderHistory extends HttpServlet {
 			sb.append("</tr>");
 		}
 		sb.append("</tbody></table>");
-	}
-
-	private void getOrdersFromDatabase(Connection conn, int userId, Map<Integer, OrderDetails> orderMap) {
-		try {
-			PreparedStatement pSt = conn.prepareStatement("SELECT o.id, o.user_id, o.total,o.timestamp, oi.quantity, i.name, i.price FROM orders o JOIN order_items oi ON o.id = oi.order_id JOIN items i ON i.id = oi.item_id WHERE user_id = ? ORDER BY timestamp DESC, id");
-			pSt.setInt(1, userId);
-			
-			ResultSet rs = pSt.executeQuery();
-			
-			if(rs.next()) {
-				
-				do {
-					
-					
-					Date orderDateTime = rs.getTimestamp("timestamp");
-					double orderTotal = ((double)rs.getInt("total")) / 100;
-					
-					OrderDetails od = new OrderDetails(rs.getInt("id"), rs.getInt("user_id"), orderTotal, orderDateTime);
-					ItemDetails itmDetails = new ItemDetails(rs.getInt("quantity"), rs.getString("name"), ((double)rs.getInt("price")) / 100);
-					if(orderMap.containsKey(od.getId())) {
-						od = orderMap.get(od.getId());
-						od.addItem(itmDetails);
-					} else {
-						od.addItem(itmDetails);
-						orderMap.put(od.getId(), od);
-					}
-					
-				} while (rs.next());
-			}
-			
-			rs.close();
-			pSt.close();
-			
-			
-		} catch (SQLException e) {
-			System.out.println("SQLException " + e);
-		}
-	}
-
-	private int getUserIdForEmail(Connection conn, String email) {
-		int userId = -1;
-		PreparedStatement pSt;
-		try {
-			pSt = conn.prepareStatement("SELECT id FROM users WHERE email = ?");
-			pSt.setString(1, email);
-			
-			ResultSet rs = pSt.executeQuery();
-			
-			if(rs.next()) {
-				 userId = rs.getInt("id");
-			}
-			
-			rs.close();
-			pSt.close();
-		} catch (SQLException e) {
-			System.out.println("SQLException " + e);
-		}
-		return userId;
 	}
 
 }

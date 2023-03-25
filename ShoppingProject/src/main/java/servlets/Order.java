@@ -34,7 +34,7 @@ public class Order extends HttpServlet {
 
 			String email = (String) session.getAttribute("email");
 
-			int userId = DatabaseConnection.getInstance().getUserIDForUser(email);
+			int userId = DatabaseConnection.getInstance().getUserIDForEmail(email);
 
 			int orderId = DatabaseConnection.getInstance().createOrder(totalValue, userId);
 
